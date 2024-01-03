@@ -26,12 +26,12 @@ const transformer = transform((record, callback) => {
       const transformedRecord = Object.values(record).join(" ") + "\n";
       callback(null, transformedRecord);
     } else {
-      callback(null, ""); // Skip non-array and non-object records
+      callback(null, "");
     }
   }, 500);
 });
 
-// Making a readable stream from the CSV file
+
 const csvStream = createReadStream(csvFilePath);
 
 csvStream.pipe(parser).pipe(transformer).pipe(process.stdout);
@@ -42,7 +42,7 @@ parser.on("data", function (record) {
 
 parser.on("end", function () {
   console.log("CSV parsing completed.");
-  console.log(records); // Prints the array of JSON objects
+  console.log(records); 
 });
 
 parser.on("error", function (err) {
