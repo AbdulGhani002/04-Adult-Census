@@ -5,7 +5,7 @@ const { join } = require("path");
 
 const csvFilePath = join(__dirname, "adult.csv");
 
-const records = [];
+const filteredRecords = [];
 
 const parser = parse({
   comment: "#",
@@ -16,27 +16,27 @@ const parser = parse({
 const filterRecords = transform((record, callback) => {
   setTimeout(() => {
     if (record && record.income === ">50K") {
-      const transformedRecord = Object.values(record).join(" ") + "\n";
-      callback(null, transformedRecord);
-    } else {
-      callback(null, "");
+      filteredRecords.push(record);
     }
+    callback(null, "");
   }, 500);
 });
 
 const csvStream = createReadStream(csvFilePath);
 
-csvStream.pipe(parser).pipe(filterRecords).pipe(process.stdout);
+csvStream
+  .pipe(parser)
+  .pipe(filterRecords)
+  .on("end", () => {
+    console.log(JSON.stringify(filteredRecords, null, 2));
+  });
 
 parser.on("data", function (record) {
-  if (record && record.income === ">50K") {
-    records.push(record);
-  }
+  console.log(filteredRecords);
 });
 
 parser.on("end", function () {
   console.log("CSV parsing completed.");
-  console.log("Records with income > 50K:", records.length);
 });
 
 parser.on("error", function (err) {
